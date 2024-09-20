@@ -37,6 +37,13 @@ void debug_print_matrix4(const char* fmt, const char* fn, char* name, br_matrix4
 #define LOG_VEC(msg, v) debug_print_vector3("\033[0;34m[DEBUG] %s ", __FUNCTION__, msg, v)
 #define LOG_MATRIX(msg, m) debug_print_matrix34("\033[0;34m[DEBUG] %s ", __FUNCTION__, msg, m)
 #define LOG_MATRIX4(msg, m) debug_print_matrix4("\033[0;34m[DEBUG] %s ", __FUNCTION__, msg, m)
+#ifdef __AMIGAOS4__ //no log_info and warn
+#define LOG_INFO(...)
+#define LOG_WARN(...)
+#define LOG_PANIC(...) 
+#define LOG_WARN_ONCE(...) 
+#define NOT_IMPLEMENTED() 
+#else
 #define LOG_INFO(...) debug_printf("[INFO] %s ", __FUNCTION__, __VA_ARGS__)
 #define LOG_WARN(...) debug_printf("\033[0;33m[WARN] %s ", __FUNCTION__, __VA_ARGS__)
 #define LOG_PANIC(...)                                                    \
@@ -54,6 +61,7 @@ void debug_print_matrix4(const char* fmt, const char* fn, char* name, br_matrix4
 
 #define NOT_IMPLEMENTED() \
     LOG_PANIC("not implemented")
+#endif//AOS4
 
 #define TELL_ME_IF_WE_PASS_THIS_WAY() \
     LOG_PANIC("code path not expected")

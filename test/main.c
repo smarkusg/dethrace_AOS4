@@ -114,7 +114,11 @@ void TEST_ASSERT_EQUAL_FILE_TEXT(const char* expected, char* filename) {
 void setup_global_vars(int argc, char* argv[]) {
     strcpy(gDir_separator, "/");
 
+#ifdef __AMIGAOS4__
+    root_dir ="/PROGDIR/GAME"
+#else
     root_dir = getenv("DETHRACE_ROOT_DIR");
+#endif
     if (root_dir != NULL) {
         printf("DETHRACE_ROOT_DIR: %s\n", root_dir);
         if (chdir(root_dir)) {

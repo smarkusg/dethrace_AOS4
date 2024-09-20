@@ -3348,6 +3348,11 @@ int GetCDPathFromPathsTxtFile(char* pPath_name) {
     tPath_name paths_txt;
     LOG_TRACE9("()");
 
+#ifdef __AMIGAOS4__
+    paths_txt_fp = NULL;
+    return 0;
+#endif
+
     if (!got_it_already) {
         sprintf(paths_txt, "%s%s%s", gApplication_path, gDir_separator, "PATHS.TXT");
         paths_txt_fp = fopen(paths_txt, "rt");

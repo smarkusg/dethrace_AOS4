@@ -29,6 +29,10 @@
 
 #define KEYDOWN(var, key) (var[key] & 0x80)
 
+#ifdef __AMIGAOS4__
+extern char* SDL_FULL;
+#endif
+
 int gExtra_mem;
 int gReplay_override;
 tGraf_spec gGraf_specs[2] = {
@@ -965,6 +969,11 @@ int original_main(int pArgc, char** pArgv) {
         strcat(gNetwork_profile_fname, "/");
         strcat(gNetwork_profile_fname, "NETWORK.INI");
     }
+
+#ifdef __AMIGAOS4__
+    if (SDL_FULL) gGraf_spec_index = 1;
+    free(SDL_FULL);
+#endif
 
     GameMain(pArgc, pArgv);
     return 0;

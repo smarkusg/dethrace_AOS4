@@ -165,6 +165,9 @@ target_sources(dethrace_obj PRIVATE
     pc-win95/win95net.c
     pc-dos/dosnet.c
     pc-dos/dossys.c
+    amigaos4/amigaos4.c
+    amigaos4/amigaos4.h
+
 )
 
 # Create our main game binary.

@@ -1,6 +1,8 @@
 #ifndef HARNESS_VERSION_H
 #define HARNESS_VERSION_H
-
+#ifndef __AMIGAOS4__
 #cmakedefine DETHRACE_VERSION "@DETHRACE_VERSION@"
-
+#else
+#cmakedefine DETHRACE_VERSION "dethrace Port by BSzili compiling for AOS4 smarkusg (20.09.2024)"
+#endif
 #endif

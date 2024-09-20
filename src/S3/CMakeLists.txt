@@ -19,6 +19,12 @@ else()
         /wd4996
     )
 endif()
+if(AMIGAOS4)
+    target_link_libraries(s3 PUBLIC pthread m atomic)
+    add_compile_flags_if_supported(s3
+        -Wstrict-prototypes
+    )
+endif()
 if(DETHRACE_FIX_BUGS)
     target_compile_definitions(s3 PRIVATE DETHRACE_FIX_BUGS)
 endif()
@@ -28,6 +34,7 @@ if(IS_BIGENDIAN)
 else()
     target_compile_definitions(s3 PRIVATE BR_ENDIAN_LITTLE=1)
 endif()
+
 
 target_sources(s3 PRIVATE
     3d.c

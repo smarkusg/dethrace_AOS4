@@ -9,6 +9,15 @@
 
 #include "brender.h"
 
+#ifdef __AMIGAOS4__
+extern void AmigOS_tooltype2(int argc, char *argv[]);
+#ifndef DETHRACE_VERSION
+#define DETHRACE_VERSION "dethrace Port by BSzili compiling for AOS4 smarkusg (20.09.2024)"
+#endif
+static const char *__attribute__((used)) stackcookie = "$STACK: 5000000";
+static const char *__attribute__((used)) version_tag = "$VER: " DETHRACE_VERSION;
+#endif //AOS4
+
 extern void Harness_Init(int* argc, char* argv[]);
 extern int original_main(int pArgc, char* pArgv[]);
 
@@ -43,7 +52,12 @@ int main(int argc, char* argv[]) {
     }
 #endif
 
+#ifdef __AMIGAOS4__
+    AmigOS_tooltype2(argc, argv);
+#endif
+
     Harness_Init(&argc, argv);
 
     return original_main(argc, argv);
+
 }

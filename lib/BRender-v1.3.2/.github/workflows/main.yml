@@ -1,0 +1,51 @@
+name: Workflow
+
+on:
+  push:
+    branches:
+      - 'main'
+      - 'ci-*'
+    tags:
+      - 'v*'
+  pull_request:
+
+jobs:
+
+  ci:
+    strategy:
+      matrix:
+        platform:
+          - { name: 'Linux',    arch: 'x64',        os: ubuntu-latest, werror: true }
+          - { name: 'Linux',    arch: 'arm64',      os: ubuntu-latest, werror: true, cmake-toolchain-file: 'cmake/toolchains/linux-aarch64.cmake', apt-packages: 'gcc-aarch64-linux-gnu g++-aarch64-linux-gnu', cross: true }
+          - { name: 'MacOS',    arch: 'arm64-x64',  os: macos-latest,  werror: true, cmake-args: '-DCMAKE_OSX_ARCHITECTURES="x86_64;arm64"' }
+          - { name: 'Windows',  arch: 'Win32',      os: windows-latest }
+          - { name: 'Windows',  arch: 'x64',        os: windows-latest }
+
+    defaults:
+      run:
+        shell: sh
+    runs-on: '${{ matrix.platform.os }}'
+    name: 'CI ${{ matrix.platform.name }} ${{ matrix.platform.arch }}'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Ninja
+        uses: aseprite/get-ninja@main
+      - uses: ilammy/msvc-dev-cmd@v1.13.0
+        if: runner.os == 'Windows'
+        with:
+          arch: ${{ matrix.platform.arch }}
+      - name: Install Linux dependencies
+        if: ${{ runner.os == 'Linux' }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ${{ matrix.platform.apt-packages }}
+      - name: 'Configure (CMake)'
+        id: configure
+        run: |
+          cmake -B build -GNinja \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DCMAKE_TOOLCHAIN_FILE=${{ matrix.platform.cmake-toolchain-file }} \
+            ${{ matrix.platform.cmake-args }}
+      - name: 'Build (CMake)'
+        run: |
+          cmake --build build

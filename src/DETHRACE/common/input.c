@@ -297,10 +297,12 @@ int KeyIsDown(int pKey_index) {
 // IDA: void __cdecl WaitForNoKeys()
 void WaitForNoKeys(void) {
     LOG_TRACE("()");
-
+#ifndef __AMIGAOS4__
+/* markus fast quit - no wait fixme ??? */
     while (AnyKeyDown() || EitherMouseButtonDown()) {
         CheckQuit();
     }
+#endif
     CheckQuit();
 }
 

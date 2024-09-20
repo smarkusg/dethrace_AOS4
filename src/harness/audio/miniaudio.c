@@ -10,8 +10,17 @@
 #define STB_VORBIS_HEADER_ONLY
 #include "stb/stb_vorbis.c"
 
+#ifdef __AMIGAOS4__
+#define MA_AMIGAOS4
+#endif
+
 #define MINIAUDIO_IMPLEMENTATION
 #include "miniaudio/miniaudio.h"
+
+#ifdef __AMIGAOS4__
+#define MA_NO_PTHREAD_IN_HEADER
+#define MA_NO_RUNTIME_LINKING
+#endif
 
 // Must come after miniaudio.h
 #undef STB_VORBIS_HEADER_ONLY

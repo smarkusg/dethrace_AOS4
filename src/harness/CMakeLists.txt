@@ -81,6 +81,10 @@ elseif(APPLE)
     target_sources(harness PRIVATE
         os/macos.c
     )
+elseif(AMIGAOS4)
+    target_sources(harness PRIVATE
+        os/amigaos4.c
+    )
 else()
     target_sources(harness PRIVATE
         os/linux.c

@@ -25,11 +25,20 @@ static void* create_window_and_renderer(char* title, int x, int y, int width, in
         LOG_PANIC("SDL_INIT_VIDEO error: %s", SDL_GetError());
     }
 
+#ifndef __AMIGAOS4__
     window = SDL_CreateWindow(title,
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
         width, height,
         SDL_WINDOW_RESIZABLE);
+#else
+//    int flags = SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC ;
+    window = SDL_CreateWindow(title,
+        SDL_WINDOWPOS_CENTERED,
+        SDL_WINDOWPOS_CENTERED,
+        width, height,
+        (SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC));
+#endif
 
     if (window == NULL) {
         LOG_PANIC("Failed to create window: %s", SDL_GetError());
@@ -50,6 +59,10 @@ static void* create_window_and_renderer(char* title, int x, int y, int width, in
     if (screen_texture == NULL) {
         SDL_RendererInfo info;
         SDL_GetRendererInfo(renderer, &info);
+#ifdef __AMIGAOS4__
+        SDL_SetWindowMinimumSize(window, width, height);
+        SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
+#endif
         for (Uint32 i = 0; i < info.num_texture_formats; i++) {
             LOG_INFO("%s\n", SDL_GetPixelFormatName(info.texture_formats[i]));
         }
@@ -61,10 +74,12 @@ static void* create_window_and_renderer(char* title, int x, int y, int width, in
 
 static int set_window_pos(void* hWnd, int x, int y, int nWidth, int nHeight) {
     // SDL_SetWindowPosition(hWnd, x, y);
+#ifndef __AMIGAOS4__
     if (nWidth == 320 && nHeight == 200) {
         nWidth = 640;
         nHeight = 400;
     }
+#endif
     SDL_SetWindowSize(hWnd, nWidth, nHeight);
     return 0;
 }
@@ -96,10 +111,12 @@ static int get_and_handle_message(MSG_* msg) {
                         // Ignore keydown of RETURN when used together with some modifier
                         return 0;
                     }
+#ifndef __AMIGAOS4__ //disable window /fullscreen change 
                 } else if (event.key.type == SDL_KEYUP) {
                     if (is_only_key_modifier(event.key.keysym.mod, KMOD_ALT)) {
                         SDL_SetWindowFullscreen(window, (SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN_DESKTOP) ? 0 : SDL_WINDOW_FULLSCREEN_DESKTOP);
                     }
+#endif
                 }
             }
 
@@ -180,7 +197,9 @@ static void present_screen(br_pixelmap* src) {
         src_pixels++;
     }
     SDL_UnlockTexture(screen_texture);
+#ifndef __AMIGAOS4__
     SDL_RenderClear(renderer);
+#endif
     SDL_RenderCopy(renderer, screen_texture, NULL, NULL);
     SDL_RenderPresent(renderer);
 
@@ -205,7 +224,24 @@ int show_error_message(void* window, char* text, char* caption) {
     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, caption, text, window);
     return 0;
 }
+/* markus test from https://github.com/BeWorld2018/dethrace/tree/fix-DestroyWindow */
+void Harness_Platform_Init(tHarness_platform* platform) {
+    platform->ProcessWindowMessages = get_and_handle_message;
+    platform->Sleep = SDL_Delay;
+    platform->GetTicks = SDL_GetTicks;
+    platform->CreateWindowAndRenderer = create_window_and_renderer;
+    platform->ShowCursor = SDL_ShowCursor;
+    platform->SetWindowPos = set_window_pos;
+    platform->DestroyWindow = destroy_window;
+    platform->GetKeyboardState = get_keyboard_state;
+    platform->GetMousePosition = get_mouse_position;
+    platform->GetMouseButtons = get_mouse_buttons;
+    platform->ShowErrorMessage = show_error_message;
+    platform->Renderer_SetPalette = set_palette;
+    platform->Renderer_Present = present_screen;
+}
 
+/* old 
 void Harness_Platform_Init(tHarness_platform* platform) {
     platform->ProcessWindowMessages = get_and_handle_message;
     platform->Sleep = SDL_Delay;
@@ -222,3 +258,4 @@ void Harness_Platform_Init(tHarness_platform* platform) {
     platform->Renderer_SetPalette = set_palette;
     platform->Renderer_Present = present_screen;
 }
+*/

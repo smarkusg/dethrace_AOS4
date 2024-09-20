@@ -42,19 +42,25 @@ static void Harness_DetectGameMode(void) {
             harness_game_info.defines.INTRO_SMK_FILE = "SPLINTRO.SMK";
             harness_game_info.defines.GERMAN_LOADSCRN = "LOADSCRN.PIX";
             harness_game_info.mode = eGame_splatpack;
+#ifndef __AMIGAOS4__ // todo tooltip fot this fixme
             printf("Game mode: Splat Pack\n");
+#endif
         } else if (access("DATA/RACES/TINSEL.TXT", F_OK) != -1) {
             // Only the the splat x-mas demo has the tinsel track
             harness_game_info.defines.INTRO_SMK_FILE = "MIX_INTR.SMK";
             harness_game_info.defines.GERMAN_LOADSCRN = "";
             harness_game_info.mode = eGame_splatpack_xmas_demo;
+#ifndef __AMIGAOS4__ // todo tooltip fot this fixme
             printf("Game mode: Splat Pack X-mas demo\n");
+#endif
         } else {
             // Assume we're using the splatpack demo
             harness_game_info.defines.INTRO_SMK_FILE = "MIX_INTR.SMK";
             harness_game_info.defines.GERMAN_LOADSCRN = "";
             harness_game_info.mode = eGame_splatpack_demo;
+#ifndef __AMIGAOS4__ // todo tooltip fot this fixme
             printf("Game mode: Splat Pack demo\n");
+#endif
         }
     } else if (access("DATA/RACES/CITYB3.TXT", F_OK) != -1) {
         // All non-splatpack edition have the cityb3 track
@@ -63,7 +69,9 @@ static void Harness_DetectGameMode(void) {
             harness_game_info.defines.INTRO_SMK_FILE = "";
             harness_game_info.defines.GERMAN_LOADSCRN = "COWLESS.PIX";
             harness_game_info.mode = eGame_carmageddon_demo;
+#ifndef __AMIGAOS4__ // todo tooltip fot this fixme
             printf("Game mode: Carmageddon demo\n");
+#endif
         } else {
             goto carmageddon;
         }
@@ -76,7 +84,9 @@ static void Harness_DetectGameMode(void) {
         }
         harness_game_info.defines.GERMAN_LOADSCRN = "LOADSCRN.PIX";
         harness_game_info.mode = eGame_carmageddon;
+#ifndef __AMIGAOS4__ // todo tooltip fot this fixme
         printf("Game mode: Carmageddon\n");
+#endif
     }
 
     harness_game_info.localization = eGameLocalization_none;
@@ -132,8 +142,9 @@ static void Harness_DetectGameMode(void) {
 void Harness_Init(int* argc, char* argv[]) {
     int result;
 
+#ifndef __AMIGAOS4__ // todo tooltip fot this fixme
     printf("Dethrace version: %s\n", DETHRACE_VERSION);
-
+#endif
     memset(&harness_game_info, 0, sizeof(harness_game_info));
 
     // disable the original CD check code
@@ -169,8 +180,11 @@ void Harness_Init(int* argc, char* argv[]) {
     if (harness_game_config.install_signalhandler) {
         OS_InstallSignalHandler(argv[0]);
     }
-
+#ifdef __AMIGAOS4__
+    char* root_dir ="/PROGDIR/GAME/";
+#else
     char* root_dir = getenv("DETHRACE_ROOT_DIR");
+#endif
     if (root_dir != NULL) {
         LOG_INFO("DETHRACE_ROOT_DIR is set to '%s'", root_dir);
     } else {
@@ -178,7 +192,9 @@ void Harness_Init(int* argc, char* argv[]) {
     }
     // if root_dir is null or empty, no need to chdir
     if (root_dir != NULL && root_dir[0] != '\0') {
+#ifndef __AMIGAOS4__ // todo tooltip fot this fixme
         printf("Using root directory: %s\n", root_dir);
+#endif
         result = chdir(root_dir);
         if (result != 0) {
             LOG_PANIC("Failed to chdir. Error is %s", strerror(errno));
